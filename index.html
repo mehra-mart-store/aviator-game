@@ -1,0 +1,111 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AVIATOR - Gaming</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#101114;color:white;font-family:Arial,sans-serif}
+header{background:#191a1f;padding:18px;display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid #d52e39}
+.logo{font-size:25px;font-weight:bold;color:#ff3544}
+.wallet{background:#292b32;padding:10px 14px;border-radius:9px}
+nav{display:flex;justify-content:space-around;background:#1b1c21;padding:15px}
+nav a{color:white;text-decoration:none;font-size:13px}
+main{max-width:900px;margin:25px auto;padding:15px}
+.game{background:#191a20;border:1px solid #34343c;border-radius:14px;overflow:hidden}
+.game-title{text-align:center;padding:20px;color:#ff3544;font-size:24px;font-weight:bold}
+.sky{height:260px;background:radial-gradient(ellipse at bottom,#461a20,#15151b 70%);position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.plane{font-size:65px;position:absolute;left:10%;top:45%;transition:transform 1s}
+.multiplier{font-size:55px;font-weight:bold;color:#ff3544;z-index:2}
+.controls{padding:20px;display:grid;grid-template-columns:1fr 1fr;gap:12px}
+input{width:100%;padding:14px;background:#292b32;border:1px solid #444;color:white;border-radius:8px}
+button{padding:14px;border:0;border-radius:8px;background:#d72e3b;color:white;font-weight:bold;cursor:pointer}
+button:disabled{opacity:.5}
+.section{background:#1c1d23;margin-top:20px;padding:20px;border-radius:12px}
+.section h3{color:#ff4954;margin-bottom:15px}
+.history{display:flex;flex-wrap:wrap;gap:10px}
+.history span{padding:9px 13px;border-radius:8px;background:#333}
+footer{text-align:center;color:#888;padding:25px}
+@media(max-width:500px){.multiplier{font-size:42px}.sky{height:220px}.controls{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header>
+<div class="logo">✈ AVIATOR</div>
+<div class="wallet">Coins: <b id="balance">1000</b></div>
+</header>
+<nav>
+<a href="#game">GAME</a>
+<a href="#wallet">WALLET</a>
+<a href="#history">HISTORY</a>
+</nav>
+<main>
+<div class="game" id="game">
+<div class="game-title">AVIATOR</div>
+<div class="sky">
+<div class="multiplier" id="multiplier">1.00x</div>
+<div class="plane" id="plane">✈</div>
+</div>
+<div class="controls">
+<input id="bet" type="number" min="1" value="10" placeholder="Virtual coins">
+<button id="play" onclick="startGame()">START ROUND</button>
+</div>
+<p id="message" style="text-align:center;padding:10px;color:#ccc">Ready for next round</p>
+</div>
+<div class="section" id="wallet">
+<h3>MY WALLET</h3>
+<p>Virtual coin balance: <b id="walletBalance">1000</b></p>
+<p style="margin-top:10px;color:#aaa;font-size:13px">Practice coins only. No real-money transactions.</p>
+</div>
+<div class="section" id="history">
+<h3>ROUND HISTORY</h3>
+<div class="history" id="historyList">No rounds yet</div>
+</div>
+</main>
+<footer>AVIATOR GAMING · VIRTUAL COIN VERSION</footer>
+<script>
+let balance=1000;
+let playing=false;
+let timer=null;
+function updateBalance(){
+document.getElementById('balance').textContent=balance;
+document.getElementById('walletBalance').textContent=balance;
+}
+function startGame(){
+if(playing)return;
+let bet=Number(document.getElementById('bet').value);
+if(!Number.isFinite(bet)||bet<=0||bet>balance){
+document.getElementById('message').textContent='Enter a valid virtual coin amount.';
+return;
+}
+balance-=bet;
+updateBalance();
+playing=true;
+let multiplier=1;
+let crashAt=1.2+Math.random()*5;
+let start=Date.now();
+document.getElementById('play').disabled=true;
+document.getElementById('message').textContent='Plane is flying...';
+timer=setInterval(()=>{
+multiplier=1+Math.pow((Date.now()-start)/1000,1.3)*0.18;
+document.getElementById('multiplier').textContent=multiplier.toFixed(2)+'x';
+document.getElementById('plane').style.transform='translate(100px,-45px)';
+if(multiplier>=crashAt){
+clearInterval(timer);
+playing=false;
+document.getElementById('multiplier').textContent='CRASHED';
+document.getElementById('message').textContent='Round ended. Virtual coins lost.';
+let item=document.createElement('span');
+item.textContent=crashAt.toFixed(2)+'x';
+document.getElementById('historyList').prepend(item);
+document.getElementById('play').disabled=false;
+document.getElementById('plane').style.transform='translate(0,0)';
+}
+},100);
+}
+updateBalance();
+</script>
+</body>
+</html>
